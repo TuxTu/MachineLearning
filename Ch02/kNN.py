@@ -59,6 +59,25 @@ def autoNorm(dataSet):
     normDataSet = normDataSet/tile(ranges, (m,1))   #element wise divide
     return normDataSet, ranges, minVals
    
+def datingClassTestRandom(hoRatio):
+    #hoRatio = 0.90      #hold out 10%
+    datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')       #load data setfrom file
+    normMat, ranges, minVals = autoNorm(datingDataMat)
+    m = normMat.shape[0]
+    numTestVecs = int(m*hoRatio)
+    errorCount = 0.0
+    randArray = []
+    for i in range(numTestVecs):
+        temp = random.randint(0, m-1)
+        while temp in randArray:
+            temp = random.randint(0, m-1)
+        randArray.append(temp)
+        classifierResult = classify0(normMat[temp,:],normMat[:numTestVecs,:],datingLabels[:numTestVecs],3)
+        if (classifierResult != datingLabels[temp]): errorCount += 1.0
+    print("the total error rate is: %f" % (errorCount/float(numTestVecs)))
+    print(errorCount)
+    return errorCount/float(numTestVecs)
+
 def datingClassTest():
     hoRatio = 0.50      #hold out 10%
     datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')       #load data setfrom file
@@ -122,4 +141,16 @@ def handwritingClassTest():
 datingDataMat, datingLabels = file2matrix('datingTestSet2.txt')
 print(datingDataMat)
 print(datingLabels)
+'''
+
+#test random number
+'''
+hoRatio = 0.10
+errorRate = 1
+while hoRatio < 0.7:
+    curRate = datingClassTestRandom(hoRatio)
+    if curRate < errorRate:
+        errorRate = curRate
+    hoRatio += 0.20
+print("min error rate is: %f", errorRate)
 '''
